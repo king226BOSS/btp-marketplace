@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { HardHat, User, LogOut, LayoutDashboard, Shield, Menu, X, Bell } from 'lucide-react';
-import { io } from 'socket.io-client';
-
-const socket = io('http://localhost:5000');
+import { socket } from '../socket.js';
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -15,6 +13,7 @@ export default function Navbar() {
 
   useEffect(() => {
     if (user) {
+      if (!socket.connected) socket.connect();
       socket.emit('join', user.id);
       
       // Charger le compte initial

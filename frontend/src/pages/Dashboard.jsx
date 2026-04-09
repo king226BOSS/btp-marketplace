@@ -10,9 +10,10 @@ export default function Dashboard() {
   // États pour la consultation d'un devis
   const [activeQuote, setActiveQuote] = useState(null);
   
-  // États côté Artisan (Réponse au devis)
-  const [replyText, setReplyText] = useState('');
-  const [estimatedAmount, setEstimatedAmount] = useState('');
+   // États côté Artisan (Réponse au devis)
+   const [replyText, setReplyText] = useState('');
+   const [estimatedAmount, setEstimatedAmount] = useState('');
+   const [replyFile, setReplyFile] = useState(null);
   
   // États côté Client (Paiement)
   const [showPayment, setShowPayment] = useState(false);
@@ -79,15 +80,19 @@ export default function Dashboard() {
   // --- ACTIONS ARTISAN ---
   const handleReplySubmit = async (e) => {
     e.preventDefault();
+    const formData = new FormData();
+    formData.append('estimatedAmount', estimatedAmount);
+    formData.append('artisanReply', replyText);
+    formData.append('status', 'accepte');
+    if (replyFile) {
+      formData.append('document', replyFile);
+    }
+
     try {
       const response = await fetch(`http://localhost:5000/api/quotes/${activeQuote.id}/reply`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          estimatedAmount: estimatedAmount,
-          artisanReply: replyText,
-          status: 'accepte'
-        })
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+        body: formData
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
@@ -100,6 +105,8 @@ export default function Dashboard() {
       setActiveQuote(null);
       setReplyText('');
       setEstimatedAmount('');
+      setReplyFile(null);
+      window.location.reload(); // Recharger pour voir le changement d'état complet
     } catch (err) {
       alert("Erreur: " + err.message);
     }
@@ -295,7 +302,12 @@ export default function Dashboard() {
                 <label>Message pour le client</label>
                 <textarea className="form-control" value={replyText} onChange={(e) => setReplyText(e.target.value)} required></textarea>
               </div>
-              <button type="submit" className="btn btn-primary"><Send size={18} /> Envoyer la proposition</button>
+              <div className="form-group">
+                <label>Document joint (PDF ou Image - Optionnel)</label>
+                <input type="file" className="form-control" onChange={(e) => setReplyFile(e.target.files[0])} accept=".pdf,.jpg,.jpeg,.png" />
+                <small style={{ color: 'var(--text-muted)' }}>Ex: Devis détaillé format PDF ou Schéma technique.</small>
+              </div>
+              <button type="submit" className="btn btn-primary" style={{ marginTop: '1rem' }}><Send size={18} /> Envoyer la proposition</button>
             </form>
           )}
 
@@ -305,6 +317,16 @@ export default function Dashboard() {
               <div style={{ background: '#E0F2FE', padding: '1rem', borderRadius: 'var(--radius-md)', borderLeft: '4px solid #0369A1', marginBottom: '1.5rem' }}>
                 <p><strong>Prix proposé :</strong> {activeQuote.estimated_amount} FCFA</p>
                 <p style={{ marginTop: '0.5rem' }}><strong>Message :</strong><br/>{activeQuote.artisan_reply}</p>
+                {activeQuote.document_url && (
+                  <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'white', borderRadius: 'var(--radius-sm)', border: '1px solid #BAE6FD' }}>
+                    <p style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <FileText size={18} color="#0369A1" /> 
+                      <a href={activeQuote.document_url} target="_blank" rel="noopener noreferrer" style={{ fontWeight: 600, color: '#0369A1' }}>
+                        Voir le document joint
+                      </a>
+                    </p>
+                  </div>
+                )}
               </div>
               
               {user.role === 'client' && activeQuote.status === 'accepte' && (

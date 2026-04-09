@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Bell, Check, Trash2, Clock } from 'lucide-react';
+import { socket } from '../socket.js';
 
 export default function Notifications() {
   const [notifications, setNotifications] = useState([]);
@@ -7,6 +8,14 @@ export default function Notifications() {
 
   useEffect(() => {
     fetchNotifications();
+
+    socket.on('notification', (newNotif) => {
+      setNotifications(prev => [newNotif, ...prev]);
+    });
+
+    return () => {
+      socket.off('notification');
+    };
   }, []);
 
   const fetchNotifications = async () => {

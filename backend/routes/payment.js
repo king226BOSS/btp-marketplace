@@ -1,5 +1,6 @@
 import express from 'express';
 import { query } from '../db/index.js';
+import { createNotification } from '../utils/notifications.js';
 
 const router = express.Router();
 
@@ -21,6 +22,18 @@ router.post('/initiate', async (req, res) => {
           WHERE id = $1 RETURNING *
         `;
         const { rows } = await query(sql, [quoteId]);
+        const quote = rows[0];
+
+        // Notification pour l'artisan
+        if (quote) {
+          await createNotification(
+            req.app.get('io'),
+            quote.artisan_id,
+            'payment_received',
+            `Paiement reçu (${amount} FCFA) pour le projet : ${quote.service_required}.`,
+            `/dashboard`
+          );
+        }
         
         // Dans une vraie app, on utiliserait un Webhook pour la confirmation asynchrone
         // Mais ici on renvoie la réponse directement

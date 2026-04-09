@@ -131,6 +131,33 @@ export default function Home() {
             </div>
           </form>
 
+          {/* BADGES CATÉGORIES */}
+          <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem', overflowX: 'auto', paddingBottom: '0.5rem', scrollbarWidth: 'none' }}>
+            {['Tout', 'Maçonnerie', 'Plomberie', 'Électricité', 'Peinture', 'Menuiserie', 'Froid & Clim'].map(cat => (
+              <button 
+                key={cat} 
+                onClick={() => {
+                  setSearchTerm(cat === 'Tout' ? '' : cat);
+                  fetchArtisans(cat === 'Tout' ? '' : cat, searchLocation, minRating);
+                }}
+                style={{
+                  padding: '0.5rem 1.25rem',
+                  borderRadius: '2rem',
+                  border: '1px solid rgba(255,255,255,0.3)',
+                  background: (searchTerm === cat || (cat === 'Tout' && !searchTerm)) ? 'var(--primary)' : 'rgba(255,255,255,0.1)',
+                  color: 'white',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  fontSize: '0.9rem',
+                  transition: 'all 0.2s',
+                  fontWeight: (searchTerm === cat || (cat === 'Tout' && !searchTerm)) ? '600' : '400'
+                }}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
           {/* BOUTON PRÈS DE MOI */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '1rem', flexWrap: 'wrap' }}>
             <button onClick={handleNearMe} disabled={geoLoading}

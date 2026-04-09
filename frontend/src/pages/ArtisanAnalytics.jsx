@@ -87,23 +87,45 @@ export default function ArtisanAnalytics() {
           {/* KPI CARDS */}
           <div className="grid-3" style={{ gap: '1.5rem', marginBottom: '2.5rem' }}>
             {[
-              { icon: <TrendingUp size={24} />, label: 'Revenus totaux', value: fmt(stats.total_revenue), color: '#10B981', bg: '#D1FAE5' },
-              { icon: <CheckCircle size={24} />, label: 'Taux d\'acceptation', value: `${stats.acceptance_rate}%`, color: '#3B82F6', bg: '#DBEAFE' },
-              { icon: <Eye size={24} />, label: 'Vues du profil', value: (stats.artisan?.profile_views || 142).toLocaleString(), color: '#8B5CF6', bg: '#EDE9FE' },
-              { icon: <Star size={24} />, label: 'Note moyenne', value: `${stats.artisan?.rating || '—'} / 5`, color: '#F59E0B', bg: '#FEF3C7' },
-              { icon: <Clock size={24} />, label: 'Devis en attente', value: stats.pending_quotes, color: '#F97316', bg: '#FFF7ED' },
-              { icon: <Zap size={24} />, label: 'Projets terminés', value: stats.done_quotes, color: '#059669', bg: '#D1FAE5' },
+              { icon: <TrendingUp size={24} />, label: 'Revenus totaux', value: fmt(stats.total_revenue), color: '#059669', bg: '#D1FAE5', trend: '+12.4%' },
+              { icon: <CheckCircle size={24} />, label: 'Taux d\'acceptation', value: `${stats.acceptance_rate}%`, color: '#2563EB', bg: '#DBEAFE', trend: '+5.2%' },
+              { icon: <Eye size={24} />, label: 'Vues du profil', value: (stats.artisan?.profile_views || 142).toLocaleString(), color: '#7C3AED', bg: '#EDE9FE', trend: '+18.1%' },
+              { icon: <Star size={24} />, label: 'Note moyenne', value: `${stats.artisan?.rating || '—'} / 5`, color: '#D97706', bg: '#FEF3C7', trend: 'Stable' },
+              { icon: <Clock size={24} />, label: 'Devis en attente', value: stats.pending_quotes, color: '#EA580C', bg: '#FFF7ED', trend: '-2' },
+              { icon: <Zap size={24} />, label: 'Projets terminés', value: stats.done_quotes, color: '#059669', bg: '#D1FAE5', trend: '+4' },
             ].map((kpi, i) => (
-              <div key={i} className="card" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+              <div key={i} className="card" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.25rem', position: 'relative', overflow: 'hidden' }}>
                 <div style={{ background: kpi.bg, color: kpi.color, padding: '0.875rem', borderRadius: '12px', flexShrink: 0 }}>
                   {kpi.icon}
                 </div>
                 <div>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginBottom: '0.25rem', fontWeight: 500 }}>{kpi.label}</p>
-                  <h3 style={{ color: kpi.color, fontSize: '1.5rem', margin: 0 }}>{kpi.value}</h3>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0, fontWeight: 500 }}>{kpi.label}</p>
+                    {kpi.trend && (
+                      <span style={{ fontSize: '0.7rem', color: kpi.trend.startsWith('+') ? '#059669' : '#DC2626', background: kpi.trend.startsWith('+') ? '#D1FAE5' : '#FEE2E2', padding: '1px 6px', borderRadius: '4px', fontWeight: 700 }}>
+                        {kpi.trend}
+                      </span>
+                    )}
+                  </div>
+                  <h3 style={{ color: '#1F2937', fontSize: '1.75rem', margin: '0.2rem 0 0' }}>{kpi.value}</h3>
                 </div>
               </div>
             ))}
+          </div>
+
+          <div style={{ 
+            background: 'white', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', 
+            padding: '1.25rem 2rem', marginBottom: '2.5rem', display: 'flex', alignItems: 'center', 
+            justifyContent: 'space-between', borderLeft: '6px solid #F59E0B'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <Zap size={24} color="#F59E0B" />
+              <div>
+                <h4 style={{ margin: 0, color: 'var(--secondary)' }}>Score de Performance</h4>
+                <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-muted)' }}>Vous faites partie du <strong>top 10%</strong> des artisans en {stats.artisan?.category || 'votre domaine'} ce mois-ci !</p>
+              </div>
+            </div>
+            <button className="btn" style={{ fontSize: '0.85rem', color: '#B45309', background: '#FEF3C7', padding: '0.5rem 1rem' }}>Voir mon classement</button>
           </div>
 
           {/* GRAPHIQUES */}

@@ -28,12 +28,46 @@ export default function Materials() {
   return (
     <div className="container" style={{ padding: '3rem 1.5rem' }}>
       <h1 style={{ color: 'var(--secondary)', textAlign: 'center' }}>Marché des Matériaux</h1>
-      <div className="card" style={{ padding: '1.5rem', marginBottom: '2rem', display: 'flex', gap: '1rem' }}>
-        <input className="form-control" placeholder="Rechercher..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-        <select className="form-control" value={selectedCategory} onChange={(e) => { setSelectedCategory(e.target.value); fetchProducts(e.target.value, searchTerm); }}>
-          {categories.map(c => <option key={c} value={c}>{c}</option>)}
-        </select>
-        <button onClick={() => fetchProducts(selectedCategory, searchTerm)} className="btn btn-primary">OK</button>
+      <div style={{ marginBottom: '2rem' }}>
+        <div className="card" style={{ padding: '0.75rem 1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+          <Search size={20} color="var(--text-muted)" />
+          <input 
+            className="form-control" 
+            placeholder="Rechercher un matériau (ciment, fer, sable...)" 
+            value={searchTerm} 
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              fetchProducts(selectedCategory, e.target.value);
+            }} 
+            style={{ border: 'none', background: 'transparent', width: '100%', fontSize: '1.1rem' }}
+          />
+        </div>
+
+        <div style={{ display: 'flex', gap: '0.75rem', overflowX: 'auto', paddingBottom: '0.5rem', scrollbarWidth: 'none' }}>
+          {categories.map(cat => (
+            <button 
+              key={cat} 
+              onClick={() => {
+                setSelectedCategory(cat);
+                fetchProducts(cat, searchTerm);
+              }}
+              style={{
+                padding: '0.6rem 1.5rem',
+                borderRadius: '2rem',
+                border: '1px solid var(--border)',
+                background: selectedCategory === cat ? 'var(--primary)' : 'white',
+                color: selectedCategory === cat ? 'white' : 'var(--text-muted)',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                fontWeight: 600,
+                transition: 'all 0.2s',
+                boxShadow: selectedCategory === cat ? '0 4px 6px -1px rgba(255, 107, 1, 0.4)' : 'none'
+              }}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
       </div>
       {loading ? <p>Chargement...</p> : (
         <div className="grid-3">

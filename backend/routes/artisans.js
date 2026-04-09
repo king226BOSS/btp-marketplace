@@ -53,7 +53,7 @@ router.get('/', async (req, res) => {
             POWER(SIN((RADIANS(longitude) - RADIANS($${counter + 1})) / 2), 2)
           ))
         ) <= $${counter + 2}`;
-        params.push(parseFloat(lat), parseFloat(lat), parseFloat(lng), parseFloat(radius || 10));
+        params.push(parseFloat(lat), parseFloat(lng), parseFloat(radius || 10));
         counter += 3;
 
         // Trier par distance

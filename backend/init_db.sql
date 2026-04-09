@@ -41,6 +41,7 @@ CREATE TABLE quotes (
     status quote_status DEFAULT 'en_attente',
     desired_date DATE,
     estimated_amount NUMERIC(15,2),
+    document_url VARCHAR(255), -- NOUVEAU: Lien vers un devis PDF ou photos
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

@@ -1,5 +1,6 @@
 import express from 'express';
 import { query } from '../db/index.js';
+import { createNotification } from '../utils/notifications.js';
 
 const router = express.Router();
 
@@ -32,6 +33,15 @@ router.post('/', async (req, res) => {
         
         // 4. Mettre à jour l'artisan
         await query('UPDATE users SET rating = $1, reviews_count = $2 WHERE id = $3', [newRating.toFixed(2), newCount, artisanId]);
+
+        // 5. Notification pour l'artisan
+        await createNotification(
+          req.app.get('io'),
+          artisanId,
+          'review',
+          `Vous avez reçu un nouvel avis (${rating}/5).`,
+          `/profile/${artisanId}`
+        );
       }
       
       res.status(201).json({ message: 'Avis publié avec succès', review: reviewRow.rows[0] });

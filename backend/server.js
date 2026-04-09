@@ -13,6 +13,7 @@ import analyticsRouter from './routes/analytics.js';
 import productsRouter from './routes/products.js';
 import messagesRouter from './routes/messages.js';
 import notificationsRouter from './routes/notifications.js';
+import { createNotification } from './utils/notifications.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -27,21 +28,10 @@ const io = new Server(httpServer, {
   cors: { origin: "*", methods: ["GET", "POST"] }
 });
 
-const PORT = process.env.PORT || 5000;
+// Partager io avec les routes
+app.set('io', io);
 
-// Helper to create and notify
-const createNotification = async (userId, type, content, link) => {
-  try {
-    const { query } = await import('./db/index.js');
-    const { rows } = await query(
-      'INSERT INTO notifications (user_id, type, content, link) VALUES ($1, $2, $3, $4) RETURNING *',
-      [userId, type, content, link]
-    );
-    io.to(`user_${userId}`).emit('notification', rows[0]);
-  } catch (err) {
-    console.error('Error creating notification:', err);
-  }
-};
+const PORT = process.env.PORT || 5000;
 
 // Socket.io Logic
 io.on('connection', (socket) => {
@@ -65,7 +55,7 @@ io.on('connection', (socket) => {
       io.to(`user_${senderId}`).emit('message', message);
       
       // Notify receiver
-      await createNotification(receiverId, 'message', `Nouveau message: ${content.substring(0, 30)}...`, `/messages`);
+      await createNotification(io, receiverId, 'message', `Nouveau message: ${content.substring(0, 30)}...`, `/messages`);
     } catch (err) {
       console.error('Error saving message:', err);
     }
